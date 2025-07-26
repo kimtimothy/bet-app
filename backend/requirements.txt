@@ -1,0 +1,9 @@
+# Updated to latest stable versions as of July 2025.
+fastapi==0.116.1  # High‑performance ASGI framework【906860259383442†L24-L33】
+uvicorn[standard]==0.35.0  # Lightning‑fast ASGI server【517565331826833†L24-L33】
+SQLAlchemy==2.0.41  # Latest ORM release (May 2025)【975534376549468†L24-L31】
+passlib[bcrypt]==1.7.4  # Password hashing library (no newer release)【216678342988424†L24-L31】
+python-jose[cryptography]==3.5.0  # JWT handling (May 2025)【157174839841842†L24-L31】
+pydantic==2.11.7  # Data validation library (June 2025)【234096313155651†L24-L31】
+python-dotenv==1.0.1  # Load environment variables from .env files
+requests==2.31.0  # HTTP library used to fetch JWKS

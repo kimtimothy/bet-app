@@ -1,0 +1,33 @@
+{
+  "name": "friendly-betting-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "expo": "^53.0.20",
+    "expo-status-bar": "^2.2.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-native": "^0.79.0",
+    "react-native-gesture-handler": "^2.27.2",
+    "react-native-reanimated": "^4.0.0",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-screens": "^4.13.1",
+    "@react-navigation/native": "^7.1.15",
+    "@react-navigation/native-stack": "^7.3.22",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@supabase/supabase-js": "^2.52.1",
+    "nativewind": "^4.1.23",
+    "tailwindcss": "^3.4.5"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "typescript": "^5.8.3"
+  }
+}
