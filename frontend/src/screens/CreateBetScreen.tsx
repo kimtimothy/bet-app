@@ -5,6 +5,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -48,28 +49,28 @@ export default function CreateBetScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100" edges={['bottom']}> 
+    <SafeAreaView style={styles.container} edges={['bottom']}> 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        className="flex-1 p-4"
+        style={styles.content}
       >
-        <Text className="text-2xl mb-4 font-bold">Create a New Bet</Text>
+        <Text style={styles.title}>Create a New Bet</Text>
         <TextInput
-          className="border border-gray-300 bg-white p-3 mb-3 rounded-md text-base"
+          style={styles.input}
           placeholder="Bet description"
           value={description}
           onChangeText={setDescription}
           multiline
         />
         <TextInput
-          className="border border-gray-300 bg-white p-3 mb-3 rounded-md text-base"
+          style={styles.input}
           placeholder="Wager (units)"
           value={wager}
           onChangeText={setWager}
           keyboardType="numeric"
         />
         <TextInput
-          className="border border-gray-300 bg-white p-3 mb-3 rounded-md text-base"
+          style={styles.input}
           placeholder="Opponent ID (Supabase UUID)"
           value={opponentId}
           onChangeText={setOpponentId}
@@ -79,9 +80,40 @@ export default function CreateBetScreen({ navigation, route }: Props) {
           label="Create Bet"
           onPress={handleCreate}
           loading={loading}
-          className="bg-blue-600 p-3 rounded-md mt-1"
+          style={styles.button}
         />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f3f4f6',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 16,
+    fontWeight: 'bold',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    backgroundColor: 'white',
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 6,
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#2563eb',
+    padding: 12,
+    borderRadius: 6,
+    marginTop: 4,
+  },
+});

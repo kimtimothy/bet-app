@@ -124,7 +124,7 @@ def decode_supabase_token(token: str) -> dict:
     else:
         # Without verification: decode the token payload
         try:
-            payload = jwt.decode(token, options={"verify_signature": False})
+            payload = jwt.decode(token, key="", options={"verify_signature": False})
         except JWTError:
             raise credentials_exception
     return payload

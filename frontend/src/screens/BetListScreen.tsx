@@ -6,13 +6,17 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  View,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { fetchBets, setAuthToken } from '../services/api';
 import LoadingButton from '../components/LoadingButton';
+import { supabase } from '../services/supabase';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Bets'>;
 
@@ -35,8 +39,12 @@ export default function BetListScreen({ navigation }: Props) {
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) {
-        // not authenticated
-        navigation.replace('Login');
+        // not authenticated - this should not happen with persistent login
+        // but handle it gracefully
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
         return;
       }
       setAuthToken(token);
@@ -44,7 +52,17 @@ export default function BetListScreen({ navigation }: Props) {
       setBets(response.data);
     } catch (error: any) {
       console.error(error);
-      Alert.alert('Error', 'Failed to load bets');
+      if (error.response?.status === 401) {
+        // Token is invalid, clear it and redirect to login
+        await AsyncStorage.removeItem('token');
+        setAuthToken(null);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
+      } else {
+        Alert.alert('Error', 'Failed to load bets');
+      }
     } finally {
       setLoading(false);
     }
@@ -58,74 +76,92 @@ export default function BetListScreen({ navigation }: Props) {
   );
 
   const signOut = async () => {
-    await AsyncStorage.removeItem('token');
-    setAuthToken(null);
-    navigation.replace('Login');
+    try {
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+      // Clear local token
+      await AsyncStorage.removeItem('token');
+      setAuthToken(null);
+      // Navigate to login and reset the navigation stack
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      console.error('Error signing out:', error);
+      // Even if there's an error, clear local state
+      await AsyncStorage.removeItem('token');
+      setAuthToken(null);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }
   };
 
   const renderItem = ({ item }: { item: Bet }) => {
     // Compute a human readable label for the status and colour
-    let statusColour = 'text-gray-600';
+    let statusColor = '#6b7280';
     let statusLabel = '';
     switch (item.status) {
       case 'pending':
         statusLabel = 'Pending';
-        statusColour = 'text-yellow-600';
+        statusColor = '#d97706';
         break;
       case 'active':
         statusLabel = 'Active';
-        statusColour = 'text-blue-600';
+        statusColor = '#2563eb';
         break;
       case 'resolved':
         statusLabel = item.winner_id ? (item.winner_id === item.creator_id ? 'You won' : 'You lost') : 'Resolved';
-        statusColour = item.winner_id && item.winner_id === item.creator_id ? 'text-green-600' : 'text-red-600';
+        statusColor = item.winner_id && item.winner_id === item.creator_id ? '#059669' : '#dc2626';
         break;
       default:
         statusLabel = item.status;
     }
     return (
-      <View className="p-4 bg-white rounded-lg mb-3 shadow">
-        <Text className="text-lg font-semibold mb-1">{item.description}</Text>
-        <Text className="text-sm text-gray-500">Wager: {item.wager} units</Text>
-        <Text className={`text-sm mt-1 ${statusColour}`}>{statusLabel}</Text>
+      <View style={styles.betItem}>
+        <Text style={styles.betTitle}>{item.description}</Text>
+        <Text style={styles.betWager}>Wager: {item.wager} units</Text>
+        <Text style={[styles.betStatus, { color: statusColor }]}>{statusLabel}</Text>
       </View>
     );
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100" edges={['bottom']}> 
+    <SafeAreaView style={styles.container} edges={['bottom']}> 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        className="flex-1 p-4"
+        style={styles.content}
       >
-        <Text className="text-2xl font-bold mb-4">My Bets</Text>
+        <Text style={styles.title}>My Bets</Text>
         <LoadingButton
           label="New Bet"
           onPress={() => navigation.navigate('CreateBet')}
-          className="bg-blue-600 px-4 py-2 rounded-md mb-3"
+          style={styles.blueButton}
         />
         <LoadingButton
           label="Sign Out"
           onPress={signOut}
-          className="bg-red-600 px-4 py-2 rounded-md mb-3"
+          style={styles.redButton}
         />
         <LoadingButton
           label="Friends"
           onPress={() => navigation.navigate('Friends')}
-          className="bg-green-600 px-4 py-2 rounded-md mb-3"
+          style={styles.greenButton}
         />
         <LoadingButton
           label="Find Friends"
           onPress={() => navigation.navigate('SearchUsers')}
-          className="bg-yellow-600 px-4 py-2 rounded-md mb-3"
+          style={styles.yellowButton}
         />
         <LoadingButton
           label="Profile"
           onPress={() => navigation.navigate('Profile')}
-          className="bg-purple-600 px-4 py-2 rounded-md mb-3"
+          style={styles.purpleButton}
         />
         {loading ? (
-          <ActivityIndicator size="large" className="flex-1" />
+          <ActivityIndicator size="large" style={styles.loader} />
         ) : (
           <FlatList
             data={bets}
@@ -136,10 +172,57 @@ export default function BetListScreen({ navigation }: Props) {
                 ? { flexGrow: 1, justifyContent: 'center', alignItems: 'center' }
                 : undefined
             }
-            ListEmptyComponent={<Text className="text-gray-600">No bets yet. Create one!</Text>}
+            ListEmptyComponent={<Text style={styles.emptyText}>No bets yet. Create one!</Text>}
           />
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f3f4f6',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  betItem: {
+    padding: 16,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  betTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  betWager: {
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  betStatus: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  blueButton: { backgroundColor: '#2563eb', marginBottom: 12 },
+  redButton: { backgroundColor: '#dc2626', marginBottom: 12 },
+  greenButton: { backgroundColor: '#059669', marginBottom: 12 },
+  yellowButton: { backgroundColor: '#d97706', marginBottom: 12 },
+  purpleButton: { backgroundColor: '#7c3aed', marginBottom: 12 },
+  loader: { flex: 1 },
+  emptyText: { color: '#6b7280' },
+});

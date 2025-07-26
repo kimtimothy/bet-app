@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Text, TextInput, FlatList, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { Alert, Text, TextInput, FlatList, KeyboardAvoidingView, Platform, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
@@ -51,31 +51,31 @@ export default function SearchUsersScreen({ navigation }: Props) {
   };
 
   const renderItem = ({ item }: { item: User }) => (
-    <View className="p-3 bg-white mb-2 rounded-lg shadow">
-      <Text className="text-base font-semibold">
+    <View style={styles.userItem}>
+      <Text style={styles.userName}>
         {item.username || item.email || item.id}
       </Text>
-      <Text className="text-sm text-gray-500 mb-2">
+      <Text style={styles.userEmail}>
         {item.email ?? 'No email'}
       </Text>
       <LoadingButton
         label="Add Friend"
         onPress={() => handleAddFriend(item.id)}
         loading={addingFriendId === item.id}
-        className="bg-primary px-3 py-2 rounded-md"
+        style={styles.addButton}
       />
     </View>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100" edges={['bottom']}> 
+    <SafeAreaView style={styles.container} edges={['bottom']}> 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        className="flex-1 p-4"
+        style={styles.content}
       >
-        <Text className="text-2xl font-bold mb-4">Find Friends</Text>
+        <Text style={styles.title}>Find Friends</Text>
         <TextInput
-          className="border border-gray-300 bg-white p-3 mb-3 rounded-md text-base"
+          style={styles.input}
           placeholder="Search by username or email"
           value={query}
           onChangeText={setQuery}
@@ -85,7 +85,7 @@ export default function SearchUsersScreen({ navigation }: Props) {
           label="Search"
           onPress={handleSearch}
           loading={loading}
-          className="bg-primary px-4 py-3 rounded-md mb-4"
+          style={styles.searchButton}
         />
         <FlatList
           data={results}
@@ -96,9 +96,70 @@ export default function SearchUsersScreen({ navigation }: Props) {
               ? { flexGrow: 1, justifyContent: 'center', alignItems: 'center' }
               : undefined
           }
-          ListEmptyComponent={<Text className="text-gray-500">No users found. Try a different search.</Text>}
+          ListEmptyComponent={<Text style={styles.emptyText}>No users found. Try a different search.</Text>}
         />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f3f4f6',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    backgroundColor: 'white',
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 6,
+    fontSize: 16,
+  },
+  searchButton: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 6,
+    marginBottom: 16,
+  },
+  userItem: {
+    padding: 12,
+    backgroundColor: 'white',
+    marginBottom: 8,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  userEmail: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 8,
+  },
+  addButton: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  emptyText: {
+    color: '#6b7280',
+  },
+});

@@ -5,6 +5,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -40,7 +41,11 @@ export default function LoginScreen({ navigation }: Props) {
       const accessToken = session.access_token;
       await AsyncStorage.setItem('token', accessToken);
       setAuthToken(accessToken);
-      navigation.replace('Bets');
+      // Navigate to main app and reset the navigation stack
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Bets' }],
+      });
     } catch (err: any) {
       console.error(err);
       Alert.alert('Login failed', err.message ?? 'An error occurred');
@@ -50,14 +55,14 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100" edges={['bottom']}> 
+    <SafeAreaView style={styles.container} edges={['bottom']}> 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        className="flex-1 justify-center px-6"
+        style={styles.content}
       >
-        <Text className="text-3xl mb-6 text-center font-bold">Welcome back!</Text>
+        <Text style={styles.title}>Welcome back!</Text>
         <TextInput
-          className="border border-gray-300 bg-white p-3 mb-3 rounded-md text-base"
+          style={styles.input}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -65,7 +70,7 @@ export default function LoginScreen({ navigation }: Props) {
           keyboardType="email-address"
         />
         <TextInput
-          className="border border-gray-300 bg-white p-3 mb-3 rounded-md text-base"
+          style={styles.input}
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
@@ -75,15 +80,57 @@ export default function LoginScreen({ navigation }: Props) {
           label="Login"
           onPress={handleLogin}
           loading={loading}
-          className="bg-blue-600 p-3 rounded-md mb-4"
+          style={styles.loginButton}
         />
-        <Text className="text-center text-gray-700">
+        <Text style={styles.registerText}>
           New here?
         </Text>
-        <Text className="mt-2 text-blue-600 text-center" onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.registerLink} onPress={() => navigation.navigate('Register')}>
           Register
         </Text>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f3f4f6',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  title: {
+    fontSize: 30,
+    marginBottom: 24,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    backgroundColor: 'white',
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 6,
+    fontSize: 16,
+  },
+  loginButton: {
+    backgroundColor: '#2563eb',
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 16,
+  },
+  registerText: {
+    textAlign: 'center',
+    color: '#374151',
+  },
+  registerLink: {
+    marginTop: 8,
+    color: '#2563eb',
+    textAlign: 'center',
+  },
+});

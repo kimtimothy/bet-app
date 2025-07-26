@@ -1,10 +1,4 @@
-/**
- * Tailwind CSS configuration for the React Native app.
- *
- * The content paths point to the TypeScript source files.  You can
- * customize the theme as desired.  See https://tailwindcss.com/docs
- * for more details.
- */
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     './App.{js,jsx,ts,tsx}',

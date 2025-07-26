@@ -5,6 +5,7 @@ These classes define the database schema for users and bets.  The
 relationships allow us to link bets back to their participants.
 """
 
+import enum
 from datetime import datetime
 from typing import Optional
 
@@ -64,12 +65,11 @@ class User(Base):
     )
 
 
-class BetStatus(str):
-    """Enumeration of possible bet statuses."""
-
+class BetStatus(str, enum.Enum):
     PENDING = "pending"
     ACTIVE = "active"
     RESOLVED = "resolved"
+
 
 
 class Bet(Base):

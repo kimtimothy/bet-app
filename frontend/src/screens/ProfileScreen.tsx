@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { Alert, Text, TextInput, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
@@ -56,21 +56,21 @@ export default function ProfileScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100" edges={['bottom']}> 
+    <SafeAreaView style={styles.container} edges={['bottom']}> 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        className="flex-1 p-4"
+        style={styles.content}
       >
-        <Text className="text-2xl font-bold mb-4">Edit Profile</Text>
+        <Text style={styles.title}>Edit Profile</Text>
         <TextInput
-          className="border border-gray-300 bg-white p-3 mb-3 rounded-md text-base"
+          style={styles.input}
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
         />
         <TextInput
-          className="border border-gray-300 bg-white p-3 mb-3 rounded-md text-base"
+          style={styles.input}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -81,9 +81,40 @@ export default function ProfileScreen({ navigation }: Props) {
           label="Save"
           onPress={handleSave}
           loading={loading}
-          className="bg-primary px-4 py-3 rounded-md"
+          style={styles.saveButton}
         />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f3f4f6',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    backgroundColor: 'white',
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 6,
+    fontSize: 16,
+  },
+  saveButton: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 6,
+  },
+});

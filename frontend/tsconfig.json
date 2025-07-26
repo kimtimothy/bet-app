@@ -3,18 +3,27 @@
     "target": "es2016",
     "module": "esnext",
     "jsx": "react-native",
-    "lib": ["dom", "es2016"],
+    "lib": [
+      "dom",
+      "es2016"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["src", "App.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src",
+    "App.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "extends": "expo/tsconfig.base"
 }
